@@ -15,11 +15,18 @@
 #define sens3 4
 #define sens4 7
 #define sens5 12
-
+/*****************
+ * 
+ *  MERGE CU: (minus insteamna motoarele pe reverse)
+ *  200, -50
+ * 
+ * ***************
+ */
 int motorSpeedA = 0;
 int motorSpeedB = 0;
-int v[6]{}, x = 999;
-int speed1 = 120, speed2 = speed1 - 50;
+int x = 999;
+int lastCurve = 1;
+int speed1 = 200, speed2 = 50 ;
 
 void setup() {
   //Motor pins
@@ -46,36 +53,44 @@ void setup() {
   Serial.begin(9600);
 }
 
-void loop() { 
-  v[1]=!digitalRead(sens1); v[2]=!digitalRead(sens2); v[3]=!digitalRead(sens3); v[4]=!digitalRead(sens4); v[5]=!digitalRead(sens5);
-  //for(int i=1;i<=5;i++) v[i] = v[i] ? 0 : 1;
+void loop() {
+  int v[6]{}; 
+  readSens(v);
  
   x = determineDirection(v);
-   /* Possible outcomes after determineDirection():
-   * 1 0 0 0 0 -> x = -1
-   * 1 1 0 0 0 -> x = -1
-   * 1 1 1 0 0 -> x = -1
-   * 0 0 1 0 0 -> x =  0
-   * 0 0 1 1 1 -> x =  1
-   * 0 0 0 1 1 -> x =  1
-   * 0 0 0 0 1 -> x =  1
-   */ 
+  setDirection(determineDirection(v));
+  
+  printSensors(v);
+  
 
-   switch (x){
+}
+
+void setDirection(int lastDirection){
+  switch (x){
     case -1:
       goLeft();
+      lastDirection = -1;
+      lastCurve = -1;
       break;
     case  0:
       goForward();
+      lastDirection = 0;
       break;
     case  1:
       goRight();
+      lastDirection = 1;
+      lastCurve = 1;
       break;
    }
-   
-  printSensors();
+  //Serial.println(lastCurve);
+  }
 
-}
+
+
+void readSens(int v[6]){
+  v[1]=!digitalRead(sens1); v[2]=!digitalRead(sens2); v[3]=!digitalRead(sens3); v[4]=!digitalRead(sens4); v[5]=!digitalRead(sens5);
+  }
+
 
 void goForward() {
   //Motor left
@@ -91,8 +106,8 @@ void goForward() {
 void goLeft() {
   //Motor left
   digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW );
-  analogWrite (enA, 0);
+  digitalWrite(in2, HIGH);
+  analogWrite (enA, speed2);
   //Motor right
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW );
@@ -106,8 +121,8 @@ void goRight() {
   analogWrite (enA, speed1);
   //Motor right
   digitalWrite(in3, LOW );
-  digitalWrite(in4, LOW );
-  analogWrite (enB, 0);
+  digitalWrite(in4, HIGH);
+  analogWrite (enB, speed2);
 }
 
 void goBackwards() {
@@ -121,7 +136,7 @@ void goBackwards() {
   analogWrite (enB, speed1);
 }
 
-void printSensors(){
+void printSensors(int v[6]){
   Serial.print(v[1]);
   Serial.print(" ");
   Serial.print(v[2]);
@@ -149,6 +164,9 @@ else if((v[1] == 0 )&&(v[2] == 0 )&&(v[3] == 1 )&&(v[4] == 1 )&&(v[5] == 0 )) op
 else if((v[1] == 0 )&&(v[2] == 0 )&&(v[3] == 0 )&&(v[4] == 1 )&&(v[5] == 0 )) op =  1;
 else if((v[1] == 0 )&&(v[2] == 0 )&&(v[3] == 0 )&&(v[4] == 1 )&&(v[5] == 1 )) op =  1;
 else if((v[1] == 0 )&&(v[2] == 0 )&&(v[3] == 0 )&&(v[4] == 0 )&&(v[5] == 1 )) op =  1;
+
+else if((v[1] == 0 )&&(v[2] == 0 )&&(v[3] == 0 )&&(v[4] == 0 )&&(v[5] == 0 )) op =  2;
+
 
   return op;
 }

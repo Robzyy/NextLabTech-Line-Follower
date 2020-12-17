@@ -17,7 +17,7 @@
 #define sens5 12
 /*****************
  * 
- *  MERGE CU: (minus insteamna motoarele pe reverse)
+ *  MERGE CU: (minus inseamna motoarele pe reverse)
  *  200, -50
  * 
  * ***************

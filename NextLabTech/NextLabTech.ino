@@ -1,7 +1,7 @@
 /*
 *
 *
-*   This is somewhat of a Romanian x English fiasco... it happens 
+*   This is a Romanian x English fiasco... it happens 
 *
 *
 */
